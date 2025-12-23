@@ -1,40 +1,60 @@
 import os
-# from dotenv import load_dotenv
-from src.memory import MemoryManager
-from src.tools import Indexer, RetrievalTools
-from src.agent import Agent
 from dotenv import load_dotenv
+from src.memory import MemoryManager
+from src.tools import Indexer, RetrievalTools, ContentLoader
+from src.agent import Agent
 
-# Load API keys from .env
 load_dotenv()
 
 def main():
-    # 1. Initialize Components
+    print("🚀 Initializing Agentic RAG...")
+    
+    # Initialize
     mem = MemoryManager()
     idx = Indexer()
+    loader = ContentLoader()
     tools = RetrievalTools(idx)
     agent = Agent(tools, mem)
 
-    # 2. Ingest Data (Simulating a document load)
-    print("--- Initializing Data ---")
-    idx.ingest([
-        "The project 'Apollo' deadline is set for March 15th, 2024.",
-        "Server passwords must be rotated every 90 days according to security policy.",
-        "Contact 'hr@company.com' for leave requests."
-    ])
-    
-    print("\n✅ System Ready! Type 'exit' to quit.\n")
+    print("\n✅ System Ready!")
+    print("Commands:")
+    print("  /add <url>       -> Scrape and index a webpage")
+    print("  /pdf <path>      -> Read and index a PDF file")
+    print("  exit             -> Quit the application\n")
 
-    # 3. Chat Loop
     while True:
-        user_input = input("You: ")
+        user_input = input("\nYou: ")
+        
         if user_input.lower() in ["exit", "quit"]:
             break
-        
+            
+        # --- Handle /add (Web) ---
+        if user_input.startswith("/add "):
+            url = user_input.split(" ", 1)[1]
+            print(f"Trying to add: {url}")
+            text_data = loader.load_url(url)
+            if text_data:
+                idx.ingest(text_data)
+            else:
+                print("Could not extract text from that URL.")
+            continue
+            
+        # --- Handle /pdf (Files) ---
+        if user_input.startswith("/pdf "):
+            path = user_input.split(" ", 1)[1]
+            if os.path.exists(path):
+                text_data = loader.load_pdf(path)
+                if text_data:
+                    idx.ingest(text_data)
+                else:
+                    print("Could not extract text from that PDF.")
+            else:
+                print("❌ File path not found.")
+            continue
+
+        # --- Standard Agent Query ---
         response = agent.run(user_input)
-        print("\n")
-        print("\n")
-        print(f"Agent: {response}\n")
+        print(f"Agent: {response}")
 
 if __name__ == "__main__":
     main()

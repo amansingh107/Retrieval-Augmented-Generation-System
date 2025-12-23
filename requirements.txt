@@ -9,3 +9,7 @@ sentence_transformers
 duckduckgo-search
 numpy
 dotenv
+beautifulsoup4 
+youtube-transcript-api 
+requests
+pypdf
