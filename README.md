@@ -1,4 +1,3 @@
-Markdown
 
     # Agentic RAG System 🤖📚
     
