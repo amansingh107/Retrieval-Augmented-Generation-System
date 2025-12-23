@@ -41,7 +41,7 @@ flowchart TD
     WebSearch --> Context
     Context --> LLM[Cohere Command-R]
     LLM --> User
-
+```
 * * *
 
 ## 📦 Tech Stack
