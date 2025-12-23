@@ -20,7 +20,7 @@ A modular, production-ready **Retrieval-Augmented Generation (RAG)** system that
 The system is built on a modular architecture separating the "Brain" (Agent), "Hands" (Tools), and "Memory" (Redis).
 
 ```mermaid
-graph TD
+flowchart TD
     User --> Agent
     Agent --> Router{Router}
     
