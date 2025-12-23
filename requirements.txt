@@ -1,0 +1,9 @@
+openai 
+cohere 
+chromadb 
+rank_bm25 
+numpy 
+redis 
+python-dotenv 
+tiktoken
+sentence-transformers
