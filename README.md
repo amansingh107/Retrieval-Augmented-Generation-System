@@ -1,5 +1,3 @@
-Markdown
-
 # Agentic RAG System 🤖📚
 
 A modular, production-ready **Retrieval-Augmented Generation (RAG)** system that goes beyond simple document search. It features an **autonomous agent** capable of routing queries between local documents, web search, and conversational memory, built with a focus on latency reduction and accuracy.
