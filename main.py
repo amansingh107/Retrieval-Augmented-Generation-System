@@ -1,48 +1,40 @@
-import json
-import hashlib
-import string
-import numpy as np
-import cohere
-import chromadb
-import redis
 import os
-from typing import List
-from chromadb.utils import embedding_functions
-from rank_bm25 import BM25Okapi
-from cache import CacheManager
-from indexer import Indexer
-from retriever import Generator
-from generator import HybridRetriever
+# from dotenv import load_dotenv
+from src.memory import MemoryManager
+from src.tools import Indexer, RetrievalTools
+from src.agent import Agent
+from dotenv import load_dotenv
 
-# 1. Initialize Pipeline
-cache = CacheManager()
-indexer = Indexer()
+# Load API keys from .env
+load_dotenv()
 
-# 2. Add Dummy Data
-sample_data = [
-    "The 'Project Alpha' return policy lasts 30 days. Contact support@alpha.com.",
-    "Project Alpha supports 4K video rendering on the Enterprise plan only.",
-    "Standard users are limited to 1080p export resolution.",
-    "To reset your password, click 'Forgot Password' on the login screen."
-]
-indexer.ingest(sample_data)
+def main():
+    # 1. Initialize Components
+    mem = MemoryManager()
+    idx = Indexer()
+    tools = RetrievalTools(idx)
+    agent = Agent(tools, mem)
 
-retriever = HybridRetriever(indexer)
-generator = Generator()
-
-# 3. Main Query Function
-def ask_rag(query):
-    print(f"\n❓ Query: {query}")
-    if hit := cache.get(query): return f"⚡ CACHED: {hit}"
+    # 2. Ingest Data (Simulating a document load)
+    print("--- Initializing Data ---")
+    idx.ingest([
+        "The project 'Apollo' deadline is set for March 15th, 2024.",
+        "Server passwords must be rotated every 90 days according to security policy.",
+        "Contact 'hr@company.com' for leave requests."
+    ])
     
-    candidates = retriever.search(query)
-    final_docs = retriever.rerank(query, candidates)
-    
-    if not final_docs: return "No info found."
-    
-    answer = generator.generate(query, "\n".join(final_docs))
-    cache.set(query, answer)
-    return f"🤖 LLM: {answer}"
+    print("\n✅ System Ready! Type 'exit' to quit.\n")
 
-# --- TEST ---
-print(ask_rag("What is the return policy?"))
+    # 3. Chat Loop
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit"]:
+            break
+        
+        response = agent.run(user_input)
+        print("\n")
+        print("\n")
+        print(f"Agent: {response}\n")
+
+if __name__ == "__main__":
+    main()
